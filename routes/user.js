@@ -1,5 +1,8 @@
 const { Router }=require('express');
 // const { use } = require('react');
+const jwt=require('jsonwebtoken');
+const{ JWT_USER_PASSWORD }=require('../config');
+const { userAuthMiddleware }=require('../middlewares/userAuth');
 
 const userRoutes=Router();
 
