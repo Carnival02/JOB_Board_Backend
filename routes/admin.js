@@ -26,33 +26,139 @@ adminRoute.post('/SignUp',async function(req,res){
     
 })
 
-adminRoute.post('/SignIn',function(req,res){
+adminRoute.post('/SignIn',async function(req,res){
 
-    res.json({
-        message:"You are DOne"
+    const{email,password}=req.body;
+    
+    const admin=await adminModel.findOne({
+        email:email,
+        password:password
     })
+
+    if(admin){
+        const token=jwt.sign({
+            id:admin._id
+        },JWT_ADMIN_PASSWORD);
+
+        res.json({
+            token:token
+        })
+
+    }else{
+        res.status(403).json({
+            message:"Incorrect hai bhai dekh le dhayn se"
+        })
+    }
+
+    
+
 })
 
-adminRoute.post('/CreateJob',function(req,res){
+adminRoute.post('/CreateJob',adminAuthMiddleware,async function(req,res){
 
-    res.json({
-        message:"You are DOne"
-    })
+    try{
+        const adminId=req.userID;
+        const {title,description,openingNumber,skills,salary}=req.body;
+        const job=await jobModel.create({
+            title:title,
+            description:description,
+            openingNumber:openingNumber,
+            skills:skills,
+            salary:salary,
+            createdBy:adminId
+
+        })
+        res.status(200).json({
+            message:"Job Created Done",
+            jobId:job._id
+
+        })
+
+
+    }catch(err){
+        console.log(err);
+        res.json({
+            message:"Kuch gadbad ho chuki hai boss"
+        })
+        
+    }
+
+
+
 })
 
-adminRoute.put('/editJob',function(req,res){
+adminRoute.put('/editJob',async function(req,res){
+    try{
+        const adminId=req.userID;
+        const {jobId,title,description,openingNumber,skills,salary}=req.body;
 
-    res.json({
-        message:"You are DOne"
-    })
+        const updatedJob=await jobModel.updateOne({
+            _id:jobId,
+            createdBy:adminId},
+            {
+            title:title,
+            description:description,
+            openingNumber:openingNumber,
+            skills:skills,
+            salary:salary,
+            // createdBy: req.adminId  
+
+        })
+        res.status(200).json({
+            message:"JOb updated"
+        })
+    }
+    catch(err){
+        console.log(err);
+        res.status(403).json({
+            message:"Update ruk gya bhai tera thik kar usko"
+        })
+        
+    }
+
 })
 
-adminRoute.get('/job',function(req,res){
+adminRoute.get('/job',async function(req,res){
 
+    const adminId=req.userID;
+
+    const jobss=await jobModel.find({
+        createdBy:adminId
+    });
     res.json({
-        message:"You are DOne"
+        message:"All the Jobs",
+        jobs:jobss
     })
+
 })
+
+adminRoute.delete('/deleteJob',async function(req,res){
+
+    try{
+        const adminId=req.userID;
+        const title=req.body;
+
+        const deletedJob= await jobModel.deleteOne({
+            createdBy:adminId
+        },{
+            title:title
+        })
+
+        res.status(200).json({
+            message:"Job deleted Successfully",
+            deletedJob:deletedJob
+        })
+    }
+    catch(err){
+        console.log(err);
+        res.json({
+            message:"Error aagya bhai mere"
+        })
+        
+    }
+})
+
+
 
 module.exports={
     adminRoute: adminRoute

@@ -1,9 +1,9 @@
 const jwt=require('jsonwebtoken');
 
-const JWT_ADMIN_PASSWORD=require('../config');
+const {JWT_ADMIN_PASSWORD}=require('../config');
 const { de } = require('zod/v4/locales');
 
-function amdinAuthMiddleware(req,res,next){
+function adminAuthMiddleware(req,res,next){
 
     const token=req.headers.token;
     const decoded=jwt.verify(token,JWT_ADMIN_PASSWORD);
@@ -20,5 +20,5 @@ function amdinAuthMiddleware(req,res,next){
 }
 
 module.exports={
-    amdinAuthMiddleware:amdinAuthMiddleware,
+    adminAuthMiddleware:adminAuthMiddleware,
 }

@@ -1,9 +1,9 @@
 const mongoose=require("mongoose");
-const { email, string } = require("zod");
+const { email, string, boolean } = require("zod");
 
 const Schema=mongoose.Schema;
-
-const ObjectID=mongoose.Types.ObjectId;
+// const { Types } = mongoose;
+const ObjectID=Schema.Types.ObjectId;
 
 const userSchema=new Schema({
     email: { type: String,unique:true},
@@ -19,8 +19,9 @@ const adminSchema=new Schema({
 })
 
 const appliedJobSchema=new Schema({
-    title:string,
-    applied:{type:Boolean}
+    userID:ObjectID,
+    jobId:{type:ObjectID,ref:"job"},
+    applied:boolean
 
 })
 const job=new Schema({
@@ -28,13 +29,14 @@ const job=new Schema({
     description:String,
     openingNumber:Number,
     skills:String,
-    Salary:Number
+    salary:Number,
+    createdBy: ObjectID
 
 })
 
 const userModel=mongoose.model("user",userSchema);
 const adminModel=mongoose.model("admin",adminSchema);
-const jobModel=mongoose.model("job",job);
+const jobModel=mongoose.model("jobs",job);
 const appliedJobModel=mongoose.model("appliedJob",appliedJobSchema);
 
 module.exports={
