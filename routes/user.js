@@ -5,6 +5,7 @@ const{ JWT_USER_PASSWORD }=require('../config');
 const {userModel,appliedJobModel,jobModel}=require('../db');
 const { userAuthMiddleware }=require('../middlewares/userAuth');
 const { Types } = require("mongoose");
+// const { use } = require('react');
 const userRoutes=Router();
 
 userRoutes.post('/Signup',async function(req,res){
@@ -104,9 +105,36 @@ userRoutes.post('/apply/:jobId',userAuthMiddleware,async function(req,res){
    
 })
 
-userRoutes.get('/appliedJob',function(req,res){
+userRoutes.get('/appliedJob',userAuthMiddleware,async function(req,res){
 
-    
+    try{
+        
+        
+      console.log(req.userId);
+      
+      const appliedJobs=await appliedJobModel.find({
+        userID:req.userId,
+        applied:true
+      })
+     if(appliedJobs){
+        res.json({
+            message:"all Jobs",
+            appliedJobs:appliedJobs
+        })
+        
+        }else{
+            res.json({
+                message:"Apply to kr bhai "
+            })
+        }
+
+    }catch(err){
+        console.log(err);
+        res.json({
+            message:"Le aa gya Error"
+        })
+        
+    }
 })
 
 module.exports={
